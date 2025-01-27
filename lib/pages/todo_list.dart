@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import 'package:todo/Modal/save_task.dart';
 // import 'package:todo/Modal/task_model.dart';
 
@@ -12,13 +13,20 @@ class TodoList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todo List'),
+        centerTitle: true,
+        title: Text(
+          'Todo List',
+          style: TextStyle(fontSize: 20.sp),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).pushNamed('addtodo');
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          size: 6.w,
+        ),
       ),
       body: Consumer<SaveTask>(
         builder: (context, task, child) {
@@ -32,9 +40,9 @@ class TodoList extends StatelessWidget {
                         context.read<SaveTask>().deleteTask(task.tasks[index]);
                       },
                       icon: Icons.delete,
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(2.w),
                       backgroundColor: Colors.red,
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
                     )
                   ]),
                   child: Column(
@@ -43,6 +51,7 @@ class TodoList extends StatelessWidget {
                         title: Text(
                           task.tasks[index].title,
                           style: TextStyle(
+                              fontSize: 20.sp,
                               decoration: task.tasks[index].isCompleted
                                   ? TextDecoration.lineThrough
                                   : TextDecoration.none),
@@ -58,7 +67,7 @@ class TodoList extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 2.h,
                       )
                     ],
                   ),
