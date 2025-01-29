@@ -4,12 +4,23 @@ import 'package:sizer/sizer.dart';
 import 'package:todo/Modal/save_task.dart';
 import 'package:todo/Modal/task_model.dart';
 
-class AddTodo extends StatelessWidget {
+class AddTodo extends StatefulWidget {
   AddTodo({super.key});
 
   static const addtodo = 'addtodo';
 
-  final controller = TextEditingController();
+  @override
+  State<AddTodo> createState() => _AddTodoState();
+}
+
+class _AddTodoState extends State<AddTodo> {
+  final namecontroller = TextEditingController();
+
+  final titlecontroller = TextEditingController();
+
+  final desccontroller = TextEditingController();
+
+  String? groupvalue;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +36,17 @@ class AddTodo extends StatelessWidget {
         child: Column(
           children: [
             TextFormField(
-              controller: controller,
+              controller: namecontroller,
+              autofocus: true,
+              decoration: InputDecoration(
+                  hintText: 'Name', hintStyle: TextStyle(fontSize: 20.sp)),
+              style: TextStyle(fontSize: 20.sp),
+            ),
+            SizedBox(
+              height: 2.h,
+            ),
+            TextFormField(
+              controller: titlecontroller,
               autofocus: true,
               decoration: InputDecoration(
                   hintText: 'Title', hintStyle: TextStyle(fontSize: 20.sp)),
@@ -34,16 +55,55 @@ class AddTodo extends StatelessWidget {
             SizedBox(
               height: 2.h,
             ),
+            TextFormField(
+              controller: desccontroller,
+              autofocus: true,
+              decoration: InputDecoration(
+                  hintText: 'Description',
+                  hintStyle: TextStyle(fontSize: 20.sp)),
+              style: TextStyle(fontSize: 20.sp),
+            ),
+            SizedBox(
+              height: 2.h,
+            ),
+            Row(
+              children: [
+                Text('Active'),
+                Radio(
+                    value: 'Active',
+                    groupValue: groupvalue,
+                    onChanged: (value) {
+                      setState(() {
+                        groupvalue = value!;
+                      });
+                    }),
+                Text('Deactive'),
+                Radio(
+                    value: 'Deactive',
+                    groupValue: groupvalue,
+                    onChanged: (value) {
+                      setState(() {
+                        groupvalue = value!;
+                      });
+                    })
+              ],
+            ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   minimumSize: Size(70.w, 5.h),
                   padding:
                       EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h)),
               onPressed: () {
-                context
-                    .read<SaveTask>()
-                    .addTask(Task(title: controller.text, isCompleted: false));
-                controller.clear();
+                context.read<SaveTask>().addTasks(Task(
+                    groupvalue: groupvalue!,
+                    name: namecontroller.text,
+                    description: desccontroller.text,
+                    title: titlecontroller.text,
+                    isCompleted: false,
+                    dateTime: DateTime.now()));
+                namecontroller.clear();
+                desccontroller.clear();
+                titlecontroller.clear();
                 Navigator.of(context).pop();
               },
               child: Text(
