@@ -19,15 +19,6 @@ class FirebaseService {
     return await messaging.getToken();
   }
 
-  void _listenForMessages() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(
-          'Message Received: ${message.notification?.title}, ${message.notification?.body}');
-      _showNotification(message.notification?.title ?? 'No Title',
-          message.notification?.body ?? 'No Body');
-    });
-  }
-
   Future<void> _requestPermission() async {
     NotificationSettings settings =
         await FirebaseMessaging.instance.requestPermission(
@@ -49,6 +40,17 @@ class FirebaseService {
       print('User denied permission');
     }
   }
+
+  void _listenForMessages() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print(
+          'Message Received: ${message.notification?.title}, ${message.notification?.body}');
+      _showNotification(message.notification?.title ?? 'No Title',
+          message.notification?.body ?? 'No Body');
+    });
+  }
+
+  
 
   Future<void> _showNotification(String title, String body) async {
     const AndroidNotificationDetails androidDetails =

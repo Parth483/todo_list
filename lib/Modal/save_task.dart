@@ -71,23 +71,28 @@ class SaveTask extends ChangeNotifier {
     }
   }
 
-  Future<void> checkTasks(int index) async {
+  Future<void> checkTasks(
+    int index,
+  ) async {
     try {
       Task task = _tasks[index];
+
       task.isDone();
+
+      String newGroupvalue = task.isCompleted ? 'Deactive' : 'Active';
+      task.groupvalue = newGroupvalue;
+
+      _tasks[index] = task;
 
       final taskDoc = await _taskcollection
           .where('title', isEqualTo: task.title)
-          .where('isCompleted', isEqualTo: !task.isCompleted)
           .where('name', isEqualTo: task.name)
           .where('description', isEqualTo: task.description)
-          .where('groupvalue', isEqualTo: task.groupvalue)
           .get();
 
       if (taskDoc.docs.isNotEmpty) {
-        await _taskcollection
-            .doc(taskDoc.docs.first.id)
-            .update({'isCompleted': task.isCompleted});
+        await _taskcollection.doc(taskDoc.docs.first.id).update(
+            {'isCompleted': task.isCompleted, 'groupvalue': newGroupvalue});
         notifyListeners();
       }
     } catch (e) {

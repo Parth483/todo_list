@@ -1,6 +1,6 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +56,7 @@ class _TodoListState extends State<TodoList> {
           return ListView.builder(
               itemCount: task.tasks.length,
               itemBuilder: (BuildContext context, index) {
+                var i = 16;
                 return Slidable(
                   endActionPane: ActionPane(motion: StretchMotion(), children: [
                     SlidableAction(
@@ -70,68 +71,154 @@ class _TodoListState extends State<TodoList> {
                   ]),
                   child: Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        // color: Colors.green,
-                        decoration: task.tasks[index].groupvalue == 'Active'
-                            ? BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(15))
-                            : BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(15)),
-                        child: Text(
-                          task.tasks[index].groupvalue,
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                      ),
-                      ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task.tasks[index].name,
-                              style: TextStyle(
-                                  fontSize: 20.sp,
-                                  decoration: task.tasks[index].isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          color: Colors.white,
+                          child: ListTile(
+                            title: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Name',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          'Title',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          'Description',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          'Date & Time',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          ':  ${task.tasks[index].name}',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          ':  ${task.tasks[index].title}',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          ':  ${task.tasks[index].description}',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                        Text(
+                                          ':  ${DateFormat('dd/MM/yy, hh:mm a').format(task.tasks[index].dateTime)}',
+                                          style: TextStyle(
+                                              fontSize: i.sp,
+                                              decoration: task.tasks[index]
+                                                          .groupvalue ==
+                                                      'Deactive'
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Positioned(
+                                  //   top: 10,
+                                  right: -90,
+                                  child: Container(
+                                    margin:
+                                        EdgeInsets.only(left: 300, right: 20),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 7, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: task.tasks[index].groupvalue ==
+                                              'Active'
+                                          ? Colors.green
+                                          : Colors.red,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      task.tasks[index].groupvalue,
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.white),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
-                            Text(
-                              task.tasks[index].title,
-                              style: TextStyle(
-                                  fontSize: 20.sp,
-                                  decoration: task.tasks[index].isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none),
+                            trailing: Wrap(
+                              children: [
+                                Checkbox(
+                                    value:
+                                        // task.tasks[index].groupvalue == 'Active'
+                                        //     ? task.tasks[index].isCompleted
+                                        task.tasks[index].isCompleted,
+                                    onChanged: (_) {
+                                      context
+                                          .read<SaveTask>()
+                                          .checkTasks(index);
+                                    })
+                              ],
                             ),
-                            Text(
-                              task.tasks[index].description,
-                              style: TextStyle(
-                                  fontSize: 20.sp,
-                                  decoration: task.tasks[index].isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none),
-                            ),
-                            Text(
-                              DateFormat('dd MMM yyyy, hh:mm a')
-                                  .format(task.tasks[index].dateTime),
-                              style: TextStyle(
-                                  fontSize: 20.sp,
-                                  decoration: task.tasks[index].isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none),
-                            ),
-                          ],
-                        ),
-                        trailing: Wrap(
-                          children: [
-                            Checkbox(
-                                value: task.tasks[index].isCompleted,
-                                onChanged: (_) {
-                                  context.read<SaveTask>().checkTasks(index);
-                                })
-                          ],
+                          ),
                         ),
                       ),
                       SizedBox(

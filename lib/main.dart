@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return Sizer(builder: (context, orientation, deviceType) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(brightness: Brightness.dark),
+        theme: ThemeData(brightness: Brightness.light),
         initialRoute: TodoList.todolist,
         routes: {
           TodoList.todolist: (context) => TodoList(),
