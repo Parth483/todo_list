@@ -1,13 +1,12 @@
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 import 'package:todo/Firebase/Firebase.dart';
 import 'package:todo/Modal/save_task.dart';
-// import 'package:todo/Modal/task_model.dart';
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
@@ -42,8 +41,10 @@ class _TodoListState extends State<TodoList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('addtodo').then((_) {
-            context.read<SaveTask>().fetchTasks();
+          Navigator.of(context).pushNamed('addtodo').then((result) {
+            if (result == true) {
+              context.read<SaveTask>().fetchTasks();
+            }
           });
         },
         child: Icon(
@@ -56,7 +57,6 @@ class _TodoListState extends State<TodoList> {
           return ListView.builder(
               itemCount: task.tasks.length,
               itemBuilder: (BuildContext context, index) {
-                var i = 16;
                 return Slidable(
                   endActionPane: ActionPane(motion: StretchMotion(), children: [
                     SlidableAction(
@@ -71,126 +71,95 @@ class _TodoListState extends State<TodoList> {
                   ]),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      Container(
+                        margin: const EdgeInsets.only(
+                            bottom: 5, left: 10, right: 10),
                         child: Card(
+                          elevation: 0.5,
                           color: Colors.white,
                           child: ListTile(
+                            contentPadding:
+                                EdgeInsets.only(left: 2.w, right: 2.w),
                             title: Stack(
                               clipBehavior: Clip.none,
                               children: [
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Name',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          border:
+                                              Border.all(color: Colors.green)),
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(14)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          child: task.tasks[index].imageUrl!
+                                                  .isEmpty
+                                              ? Shimmer.fromColors(
+                                                  baseColor: Colors.grey[300]!,
+                                                  highlightColor:
+                                                      Colors.grey[100]!,
+                                                  period: Duration(seconds: 1),
+                                                  child: Container(
+                                                      width: 80,
+                                                      height: 80,
+                                                      color: Colors.white),
+                                                )
+                                              : Image.network(
+                                                  task.tasks[index]
+                                                      .imageUrl!, // Assuming you have an image URL in your model
+                                                  width: 80, // Adjust the width
+                                                  height:
+                                                      80, // Adjust the height
+                                                  fit: BoxFit
+                                                      .cover, // Choose the fit type based on your need
+                                                ),
                                         ),
-                                        Text(
-                                          'Title',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Text(
-                                          'Description',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Text(
-                                          'Date & Time',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        )
-                                      ],
+                                      ),
                                     ),
                                     SizedBox(
                                       width: 10,
                                     ),
                                     Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          ':  ${task.tasks[index].name}',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Text(
-                                          ':  ${task.tasks[index].title}',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Text(
-                                          ':  ${task.tasks[index].description}',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Text(
-                                          ':  ${DateFormat('dd/MM/yy, hh:mm a').format(task.tasks[index].dateTime)}',
-                                          style: TextStyle(
-                                              fontSize: i.sp,
-                                              decoration: task.tasks[index]
-                                                          .groupvalue ==
-                                                      'Deactive'
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none),
-                                        ),
-                                        Image.network(
-                                          task.tasks[index]
-                                              .imageUrl!, // Assuming you have an image URL in your model
-                                          width: 50, // Adjust the width
-                                          height: 50, // Adjust the height
-                                          fit: BoxFit
-                                              .cover, // Choose the fit type based on your need
-                                        ),
+                                        getRow(
+                                            'Name',
+                                            task.tasks[index].groupvalue,
+                                            task.tasks[index].name,
+                                            0),
+                                        getRow(
+                                            'Title',
+                                            task.tasks[index].groupvalue,
+                                            task.tasks[index].title,
+                                            1),
+                                        getRow(
+                                            'Description',
+                                            task.tasks[index].groupvalue,
+                                            task.tasks[index].description,
+                                            2),
+                                        getRow(
+                                            'Date & Time',
+                                            task.tasks[index].groupvalue,
+                                            DateFormat('dd/MM/yy, hh:mm a')
+                                                .format(
+                                                    task.tasks[index].dateTime),
+                                            3),
                                       ],
                                     ),
                                   ],
                                 ),
                                 Positioned(
                                   //   top: 10,
-                                  right: -90,
+                                  right: -85,
                                   child: Container(
                                     margin:
                                         EdgeInsets.only(left: 300, right: 20),
@@ -206,7 +175,7 @@ class _TodoListState extends State<TodoList> {
                                     child: Text(
                                       task.tasks[index].groupvalue,
                                       style: TextStyle(
-                                          fontSize: 15, color: Colors.white),
+                                          fontSize: 10, color: Colors.white),
                                     ),
                                   ),
                                 )
@@ -229,15 +198,53 @@ class _TodoListState extends State<TodoList> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 2.h,
-                      )
+                      // SizedBox(
+                      //   height: 2.h,
+                      // )
                     ],
                   ),
                 );
               });
         },
       ),
+    );
+  }
+
+  Widget getRow(title, data, value, index) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+              fontSize: 13.sp,
+              decoration: data == 'Deactive'
+                  ? TextDecoration.lineThrough
+                  : TextDecoration.none),
+        ),
+        SizedBox(
+            width: index == 0
+                ? 9.w
+                : index == 1
+                    ? 10.6.w
+                    : index == 2
+                        ? 2.w
+                        : 1.3.w),
+        Text(
+          ':',
+          style: TextStyle(
+            fontSize: 13.sp,
+          ),
+        ),
+        SizedBox(width: 1.w),
+        Text(
+          value,
+          style: TextStyle(
+              fontSize: 13.sp,
+              decoration: data == 'Deactive'
+                  ? TextDecoration.lineThrough
+                  : TextDecoration.none),
+        ),
+      ],
     );
   }
 }

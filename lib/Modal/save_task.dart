@@ -35,7 +35,7 @@ class SaveTask extends ChangeNotifier {
     }
   }
 
-  Future<void> addTasks(Task task, XFile? image) async {
+  Future<bool> addTasks(Task task, XFile? image) async {
     try {
       String imageUrl = '';
 
@@ -56,8 +56,10 @@ class SaveTask extends ChangeNotifier {
       });
       // _tasks.add(task);
       notifyListeners();
+      return true;
     } catch (e) {
       print('Failed to add task:$e');
+      return false;
     }
   }
 

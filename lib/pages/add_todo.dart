@@ -32,6 +32,8 @@ class _AddTodoState extends State<AddTodo> {
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
 
+  bool isSubmit = false;
+
   Future<void> _pickImage({iscamera}) async {
     final XFile? image = await _picker.pickImage(
         source: iscamera == true ? ImageSource.camera : ImageSource.gallery);
@@ -226,40 +228,50 @@ class _AddTodoState extends State<AddTodo> {
                 SizedBox(
                   height: 20,
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: Size(70.w, 5.h),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h)),
-                  onPressed: () {
-                    if (_form.currentState?.validate() ?? false) {
-                      if (groupvalue == null) {
-                        setState(() {
-                          isGenderSelected = true;
-                        });
-                      } else {
-                        context.read<SaveTask>().addTasks(
-                            Task(
-                                groupvalue: groupvalue!,
-                                name: namecontroller.text,
-                                description: desccontroller.text,
-                                title: titlecontroller.text,
-                                isCompleted: false,
-                                dateTime: DateTime.now(),
-                                imageUrl: ''),
-                            _imageFile);
-                        namecontroller.clear();
-                        desccontroller.clear();
-                        titlecontroller.clear();
-                        Navigator.of(context).pop();
-                      }
-                    }
-                  },
-                  child: Text(
-                    'Add',
-                    style: TextStyle(fontSize: 20.sp),
-                  ),
-                )
+                !isSubmit
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(70.w, 5.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 2.h)),
+                        onPressed: () async {
+                          if (_form.currentState?.validate() ?? false) {
+                            if (groupvalue == null) {
+                              setState(() {
+                                isGenderSelected = true;
+                              });
+                            } else {
+                              setState(() {
+                                isSubmit = true;
+                              });
+                              bool isSaved = await context
+                                  .read<SaveTask>()
+                                  .addTasks(
+                                      Task(
+                                          groupvalue: groupvalue!,
+                                          name: namecontroller.text,
+                                          description: desccontroller.text,
+                                          title: titlecontroller.text,
+                                          isCompleted: false,
+                                          dateTime: DateTime.now(),
+                                          imageUrl: ''),
+                                      _imageFile);
+
+                              if (isSaved) {
+                                namecontroller.clear();
+                                desccontroller.clear();
+                                titlecontroller.clear();
+                                Navigator.of(context).pop(true);
+                              }
+                            }
+                          }
+                        },
+                        child: Text(
+                          'Add',
+                          style: TextStyle(fontSize: 20.sp),
+                        ),
+                      )
+                    : CircularProgressIndicator()
               ],
             ),
           ),
