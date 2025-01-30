@@ -176,6 +176,14 @@ class _TodoListState extends State<TodoList> {
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none),
                                         ),
+                                        Image.network(
+                                          task.tasks[index]
+                                              .imageUrl!, // Assuming you have an image URL in your model
+                                          width: 50, // Adjust the width
+                                          height: 50, // Adjust the height
+                                          fit: BoxFit
+                                              .cover, // Choose the fit type based on your need
+                                        ),
                                       ],
                                     ),
                                   ],

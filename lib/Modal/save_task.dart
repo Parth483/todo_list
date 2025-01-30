@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:todo/Modal/task_model.dart';
 
 class SaveTask extends ChangeNotifier {
@@ -9,6 +13,53 @@ class SaveTask extends ChangeNotifier {
 
   final CollectionReference _taskcollection =
       FirebaseFirestore.instance.collection('tasks');
+
+  Future<String> uploadImageToFirebase(XFile image) async {
+    try {
+      // Get the file name and reference
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('task_images/$fileName');
+
+      // Upload the file
+      await ref.putFile(File(image.path));
+
+      // Get the download URL of the uploaded image
+      String downloadUrl = await ref.getDownloadURL();
+      print('Image uploaded successfully: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
+  Future<void> addTasks(Task task, XFile? image) async {
+    try {
+      String imageUrl = '';
+
+      if (image != null) {
+        imageUrl = await uploadImageToFirebase(image);
+      }
+
+      print('imageUrl:' + imageUrl);
+
+      await _taskcollection.add({
+        'name': task.name,
+        'description': task.description,
+        'title': task.title,
+        'isCompleted': task.isCompleted,
+        'timestamp': FieldValue.serverTimestamp(),
+        'groupvalue': task.groupvalue,
+        'imageUrl': imageUrl
+      });
+      // _tasks.add(task);
+      notifyListeners();
+    } catch (e) {
+      print('Failed to add task:$e');
+    }
+  }
 
   Future<void> fetchTasks() async {
     try {
@@ -26,28 +77,12 @@ class SaveTask extends ChangeNotifier {
             title: doc['title'],
             isCompleted: doc['isCompleted'],
             groupvalue: doc['groupvalue'],
-            dateTime: dateTime);
+            dateTime: dateTime,
+            imageUrl: doc['imageUrl']);
       }).toList();
       notifyListeners();
     } catch (e) {
       print('Error fetching tasks:$e');
-    }
-  }
-
-  Future<void> addTasks(Task task) async {
-    try {
-      await _taskcollection.add({
-        'name': task.name,
-        'description': task.description,
-        'title': task.title,
-        'isCompleted': task.isCompleted,
-        'timestamp': FieldValue.serverTimestamp(),
-        'groupvalue': task.groupvalue
-      });
-      // _tasks.add(task);
-      notifyListeners();
-    } catch (e) {
-      print('Failed to add task:$e');
     }
   }
 
@@ -59,6 +94,7 @@ class SaveTask extends ChangeNotifier {
           .where('name', isEqualTo: task.name)
           .where('description', isEqualTo: task.description)
           .where('groupvalue', isEqualTo: task.groupvalue)
+          .where('imageUrl', isEqualTo: task.imageUrl)
           .get();
 
       if (taskDoc.docs.isNotEmpty) {

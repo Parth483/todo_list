@@ -5,6 +5,7 @@ class Task {
   String groupvalue;
   bool isCompleted;
   final DateTime dateTime;
+  final String? imageUrl;
 
   Task(
       {required this.name,
@@ -12,7 +13,8 @@ class Task {
       required this.title,
       required this.isCompleted,
       required this.groupvalue,
-      required this.dateTime});
+      required this.dateTime,
+      required this.imageUrl});
 
   void isDone() {
     isCompleted = !isCompleted;

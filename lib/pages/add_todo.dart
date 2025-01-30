@@ -238,13 +238,16 @@ class _AddTodoState extends State<AddTodo> {
                           isGenderSelected = true;
                         });
                       } else {
-                        context.read<SaveTask>().addTasks(Task(
-                            groupvalue: groupvalue!,
-                            name: namecontroller.text,
-                            description: desccontroller.text,
-                            title: titlecontroller.text,
-                            isCompleted: false,
-                            dateTime: DateTime.now()));
+                        context.read<SaveTask>().addTasks(
+                            Task(
+                                groupvalue: groupvalue!,
+                                name: namecontroller.text,
+                                description: desccontroller.text,
+                                title: titlecontroller.text,
+                                isCompleted: false,
+                                dateTime: DateTime.now(),
+                                imageUrl: ''),
+                            _imageFile);
                         namecontroller.clear();
                         desccontroller.clear();
                         titlecontroller.clear();
