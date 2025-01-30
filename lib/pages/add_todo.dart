@@ -86,6 +86,7 @@ class _AddTodoState extends State<AddTodo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         title: Text(
           'Add Todo',
           style: TextStyle(fontSize: 20.sp),

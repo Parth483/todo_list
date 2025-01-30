@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -34,6 +35,7 @@ class _TodoListState extends State<TodoList> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        forceMaterialTransparency: true,
         title: Text(
           'Todo List',
           style: TextStyle(fontSize: 20.sp),
@@ -100,27 +102,45 @@ class _TodoListState extends State<TodoList> {
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(14),
-                                          child: task.tasks[index].imageUrl!
-                                                  .isEmpty
-                                              ? Shimmer.fromColors(
-                                                  baseColor: Colors.grey[300]!,
-                                                  highlightColor:
-                                                      Colors.grey[100]!,
-                                                  period: Duration(seconds: 1),
-                                                  child: Container(
-                                                      width: 80,
-                                                      height: 80,
-                                                      color: Colors.white),
-                                                )
-                                              : Image.network(
-                                                  task.tasks[index]
-                                                      .imageUrl!, // Assuming you have an image URL in your model
-                                                  width: 80, // Adjust the width
-                                                  height:
-                                                      80, // Adjust the height
-                                                  fit: BoxFit
-                                                      .cover, // Choose the fit type based on your need
-                                                ),
+                                          child: CachedNetworkImage(
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                            imageUrl: task.tasks[index].imageUrl
+                                                .toString(),
+                                            placeholder: (context, url) =>
+                                                Shimmer.fromColors(
+                                              baseColor: Colors.red,
+                                              highlightColor: Colors.yellow,
+                                              period: Duration(seconds: 1),
+                                              child: Container(
+                                                  width: 80,
+                                                  height: 80,
+                                                  color: Colors.red),
+                                            ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
+                                          ),
+                                          // task.tasks[index].imageUrl == null
+                                          //     ? Shimmer.fromColors(
+                                          //         baseColor: Colors.red,
+                                          //         highlightColor: Colors.yellow,
+                                          //         period: Duration(seconds: 1),
+                                          //         child: Container(
+                                          //             width: 80,
+                                          //             height: 80,
+                                          //             color: Colors.red),
+                                          //       )
+                                          //     : Image.network(
+                                          //         task.tasks[index]
+                                          //             .imageUrl!, // Assuming you have an image URL in your model
+                                          //         width: 80, // Adjust the width
+                                          //         height:
+                                          //             80, // Adjust the height
+                                          //         fit: BoxFit
+                                          //             .cover, // Choose the fit type based on your need
+                                          //       ),
                                         ),
                                       ),
                                     ),
