@@ -90,6 +90,16 @@ class SaveTask extends ChangeNotifier {
 
   Future<void> deleteTasks(Task task) async {
     try {
+      if (task.imageUrl!.isNotEmpty) {
+        try {
+          final ref = firebase_storage.FirebaseStorage.instance
+              .refFromURL(task.imageUrl!);
+          await ref.delete();
+          print('image deleted successfully from Firebase Storage');
+        } catch (e) {
+          print('Error deleting image from Firebase Stroage:$e');
+        }
+      }
       final taskDoc = await _taskcollection
           .where('title', isEqualTo: task.title)
           .where('isCompleted', isEqualTo: task.isCompleted)

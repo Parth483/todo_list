@@ -116,7 +116,7 @@ class _TodoListState extends State<TodoList> {
                                               child: Container(
                                                   width: 80,
                                                   height: 80,
-                                                  color: Colors.red),
+                                                  color: const Color.fromARGB(255, 51, 57, 83)),
                                             ),
                                             errorWidget:
                                                 (context, url, error) =>
