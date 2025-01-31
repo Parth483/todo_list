@@ -30,6 +30,29 @@ class _TodoListState extends State<TodoList> {
     context.read<SaveTask>().fetchTasks();
   }
 
+  void _openFullScreenImage(String imageUrl) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Center(
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,25 +125,33 @@ class _TodoListState extends State<TodoList> {
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(14),
-                                          child: CachedNetworkImage(
-                                            height: 80,
-                                            width: 80,
-                                            fit: BoxFit.cover,
-                                            imageUrl: task.tasks[index].imageUrl
-                                                .toString(),
-                                            placeholder: (context, url) =>
-                                                Shimmer.fromColors(
-                                              baseColor: Colors.red,
-                                              highlightColor: Colors.yellow,
-                                              period: Duration(seconds: 1),
-                                              child: Container(
-                                                  width: 80,
-                                                  height: 80,
-                                                  color: const Color.fromARGB(255, 51, 57, 83)),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              _openFullScreenImage(
+                                                  task.tasks[index].imageUrl!);
+                                            },
+                                            child: CachedNetworkImage(
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                              imageUrl: task
+                                                  .tasks[index].imageUrl
+                                                  .toString(),
+                                              placeholder: (context, url) =>
+                                                  Shimmer.fromColors(
+                                                baseColor: Colors.red,
+                                                highlightColor: Colors.yellow,
+                                                period: Duration(seconds: 1),
+                                                child: Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    color: const Color.fromARGB(
+                                                        255, 51, 57, 83)),
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      const Icon(Icons.error),
                                             ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
                                           ),
                                           // task.tasks[index].imageUrl == null
                                           //     ? Shimmer.fromColors(
