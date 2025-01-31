@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:todo/Modal/save_task.dart';
 import 'package:todo/Modal/task_model.dart';
+import 'package:video_player/video_player.dart';
 
 class AddTodo extends StatefulWidget {
   AddTodo({super.key});
@@ -29,6 +32,7 @@ class _AddTodoState extends State<AddTodo> {
 
   bool isGenderSelected = false;
 
+//image
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
 
@@ -80,6 +84,124 @@ class _AddTodoState extends State<AddTodo> {
         ],
       ),
     );
+  }
+
+  //music
+  File? _selectedMusicFile;
+  String? _audiofileName;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  Future<void> pickMusicFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3', 'wav', 'aac', 'm4a'],
+      //allowedExtensions: ['mp3', 'wav', 'aac', 'm4a', 'mp4', 'avi', 'mov'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedMusicFile = File(result.files.single.path!);
+        _audiofileName = result.files.single.name;
+      });
+      print('Selected Music File:${_selectedMusicFile!.path}');
+    } else {
+      print('No Music File Selected');
+    }
+  }
+
+  void playMusic() async {
+    if (_selectedMusicFile != null) {
+      await _audioPlayer.play(DeviceFileSource(_selectedMusicFile!.path));
+    }
+  }
+
+  void stopMusic() async {
+    await _audioPlayer.stop();
+  }
+
+  //video
+  File? _selectedVideoFile;
+  String? _videofileName;
+  VideoPlayerController? _videocontroller;
+
+  Future<void> pickVideoFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp4', 'avi', 'mov'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedVideoFile = File(result.files.single.path!);
+        _videofileName = result.files.single.name;
+
+        // Initialize the video player controller
+        _videocontroller = VideoPlayerController.file(_selectedVideoFile!)
+          ..initialize().then((_) {
+            setState(() {});
+          });
+      });
+      print('Selected Video File: ${_selectedVideoFile!.path}');
+    } else {
+      print('No Video File Selected');
+    }
+  }
+
+  // Build video player with play and stop buttons
+  Widget _buildVideoPlayer() {
+    if (_videocontroller != null && _videocontroller!.value.isInitialized) {
+      return Column(
+        children: [
+          AspectRatio(
+            aspectRatio: _videocontroller!.value.aspectRatio,
+            child: VideoPlayer(_videocontroller!),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _videocontroller!.play();
+                  });
+                },
+                icon: Icon(Icons.play_arrow),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _videocontroller!.pause();
+                  });
+                },
+                icon: Icon(Icons.pause),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _videocontroller!
+                        .seekTo(Duration.zero); // Reset to the beginning
+                    _videocontroller!.pause(); // Pause the video
+                  });
+                },
+                icon: Icon(Icons.stop),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return Center(child: CircularProgressIndicator());
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    namecontroller.dispose();
+    titlecontroller.dispose();
+    desccontroller.dispose();
+    _audioPlayer.dispose();
+    _videocontroller?.dispose();
   }
 
   @override
@@ -142,6 +264,79 @@ class _AddTodoState extends State<AddTodo> {
                             ),
                           ),
                   ),
+                ),
+                SizedBox(
+                  height: 2.h,
+                ),
+                ElevatedButton(
+                    onPressed: pickMusicFile, child: Text('Pick Music')),
+                _selectedMusicFile != null
+                    ? Column(
+                        children: [
+                          Icon(
+                            Icons.music_note,
+                            size: 50,
+                            color: Colors.blue,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            _audiofileName ?? 'Unknown File',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: playMusic,
+                                icon: Icon(
+                                  Icons.play_arrow,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: stopMusic,
+                                icon: Icon(
+                                  Icons.stop,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      )
+                    : Text('No File Selected'),
+                SizedBox(
+                  height: 2.h,
+                ),
+                ElevatedButton(
+                    onPressed: pickVideoFile, child: Text('Pick Video')),
+                _selectedVideoFile != null
+                    ? Column(
+                        children: [
+                          Icon(
+                            Icons.video_file,
+                            size: 50,
+                            color: Colors.blue,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          _buildVideoPlayer(),
+                          Text(
+                            _videofileName ?? 'Unknown File',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )
+                    : Text('No File Selected'),
+                SizedBox(
+                  height: 2.h,
                 ),
                 TextFormField(
                   controller: namecontroller,
@@ -255,8 +450,12 @@ class _AddTodoState extends State<AddTodo> {
                                           title: titlecontroller.text,
                                           isCompleted: false,
                                           dateTime: DateTime.now(),
-                                          imageUrl: ''),
-                                      _imageFile);
+                                          imageUrl: '',
+                                          audioUrl: '',
+                                          videoUrl: ''),
+                                      _imageFile,
+                                      _selectedMusicFile,
+                                      _selectedVideoFile);
 
                               if (isSaved) {
                                 namecontroller.clear();

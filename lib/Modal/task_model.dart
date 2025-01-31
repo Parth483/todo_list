@@ -6,6 +6,8 @@ class Task {
   bool isCompleted;
   final DateTime dateTime;
   final String? imageUrl;
+  final String? audioUrl;
+  final String? videoUrl;
 
   Task(
       {required this.name,
@@ -14,7 +16,9 @@ class Task {
       required this.isCompleted,
       required this.groupvalue,
       required this.dateTime,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.audioUrl,
+      required this.videoUrl});
 
   void isDone() {
     isCompleted = !isCompleted;

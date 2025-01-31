@@ -35,15 +35,67 @@ class SaveTask extends ChangeNotifier {
     }
   }
 
-  Future<bool> addTasks(Task task, XFile? image) async {
+  Future<String> uploadAudioToFirebase(File audioFile) async {
+    try {
+      // Get the file name and reference
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('task_audios/$fileName');
+
+      // Upload the file
+      await ref.putFile(audioFile);
+
+      // Get the download URL of the uploaded audio file
+      String downloadUrl = await ref.getDownloadURL();
+      print('Audio uploaded successfully: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading audio: $e');
+      return '';
+    }
+  }
+
+  Future<String> uploadVideoToFirebase(File videoFile) async {
+    try {
+      // Get the file name and reference
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('task_videos/$fileName');
+
+      // Upload the file
+      await ref.putFile(videoFile);
+
+      // Get the download URL of the uploaded audio file
+      String downloadUrl = await ref.getDownloadURL();
+      print('video uploaded successfully: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading video: $e');
+      return '';
+    }
+  }
+
+  Future<bool> addTasks(
+      Task task, XFile? image, File? audio, File? video) async {
     try {
       String imageUrl = '';
+      String audioUrl = '';
+      String videoUrl = '';
 
       if (image != null) {
         imageUrl = await uploadImageToFirebase(image);
       }
 
-      print('imageUrl:' + imageUrl);
+      if (audio != null) {
+        audioUrl = await uploadAudioToFirebase(audio);
+      }
+
+      if (video != null) {
+        videoUrl = await uploadVideoToFirebase(video);
+      }
+      // print('imageUrl:' + imageUrl);
 
       await _taskcollection.add({
         'name': task.name,
@@ -52,7 +104,9 @@ class SaveTask extends ChangeNotifier {
         'isCompleted': task.isCompleted,
         'timestamp': FieldValue.serverTimestamp(),
         'groupvalue': task.groupvalue,
-        'imageUrl': imageUrl
+        'imageUrl': imageUrl,
+        'audioUrl': audioUrl,
+        'videoUrl': videoUrl
       });
       // _tasks.add(task);
       notifyListeners();
@@ -80,7 +134,9 @@ class SaveTask extends ChangeNotifier {
             isCompleted: doc['isCompleted'],
             groupvalue: doc['groupvalue'],
             dateTime: dateTime,
-            imageUrl: doc['imageUrl']);
+            imageUrl: doc['imageUrl'],
+            audioUrl: doc['audioUrl'],
+            videoUrl: doc['videoUrl']);
       }).toList();
       notifyListeners();
     } catch (e) {
@@ -100,6 +156,28 @@ class SaveTask extends ChangeNotifier {
           print('Error deleting image from Firebase Stroage:$e');
         }
       }
+
+      if (task.audioUrl!.isNotEmpty) {
+        try {
+          final ref = firebase_storage.FirebaseStorage.instance
+              .refFromURL(task.audioUrl!);
+          await ref.delete();
+          print('Audio deleted successfully from Firebase Storage');
+        } catch (e) {
+          print('Error deleting audio from Firebase Storage: $e');
+        }
+      }
+
+      if (task.videoUrl!.isNotEmpty) {
+        try {
+          final ref = firebase_storage.FirebaseStorage.instance
+              .refFromURL(task.videoUrl!);
+          await ref.delete();
+          print('Audio deleted successfully from Firebase Storage');
+        } catch (e) {
+          print('Error deleting audio from Firebase Storage: $e');
+        }
+      }
       final taskDoc = await _taskcollection
           .where('title', isEqualTo: task.title)
           .where('isCompleted', isEqualTo: task.isCompleted)
@@ -107,6 +185,8 @@ class SaveTask extends ChangeNotifier {
           .where('description', isEqualTo: task.description)
           .where('groupvalue', isEqualTo: task.groupvalue)
           .where('imageUrl', isEqualTo: task.imageUrl)
+          .where('audioUrl', isEqualTo: task.audioUrl)
+          .where('videoUrl', isEqualTo: task.videoUrl)
           .get();
 
       if (taskDoc.docs.isNotEmpty) {
